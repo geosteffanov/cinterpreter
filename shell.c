@@ -49,28 +49,36 @@ void trim(char* source) {
 }
 
 void strip_chars(char* source) {
-	int idx_source = 0;
-	int idx_result = 0;
-	int length_source = strlen(source);
+  int idx_source = 0;
+  int idx_result = 0;
+  int length_source = strlen(source);
+  char at_index = source[idx_source];
 
-	while (idx_source < length_source) {
-		char at_index = source[idx_source];
-		if (at_index == ' ' || at_index == '\t' || at_index == '\n') {
-		    source[idx_result] = at_index;
-		    idx_source++;
-		    idx_result++;
-		}
-		while (at_index == ' ' || at_index == '\t' || at_index == '\n') {
-			idx_source++;
-			at_index = source[idx_source];
-		}
+  while (idx_source < length_source) {
+    at_index = source[idx_source];
+    if (at_index == ' ' || at_index == '\t' || at_index == '\n') {
+        source[idx_result] = at_index;
+        idx_source++;
+        idx_result++;
 
-		source[idx_result] = at_index;
-		idx_source++;
-		idx_result++;
-	}
+        if (idx_source >= length_source) {
+            break;
+        }
 
-	source[idx_result] = 0;
+        at_index = source[idx_source];
+    }
+
+    while (at_index == ' ' || at_index == '\t' || at_index == '\n') {
+      idx_source++;
+      at_index = source[idx_source];
+    }
+
+    source[idx_result] = at_index;
+    idx_source++;
+    idx_result++;
+  }
+
+  source[idx_result] = 0;
 }
 
 /*
