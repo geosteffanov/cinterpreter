@@ -24,6 +24,30 @@ int read_input() {
 	return bytes_read;
 }
 
+void trim(char* source) {
+    int first_idx = 0;
+    int last_idx = strlen(source) - 1;
+    int length_source = strlen(source);
+
+    char at_index = source[first_idx];
+    while(first_idx < length_source  && (at_index == ' ' || at_index == '\t' || at_index == '\n')) {
+       first_idx++;
+       at_index = source[first_idx];
+    }
+
+    at_index = source[last_idx];
+    while(last_idx >= 0 && (at_index == ' ' || at_index == '\t' || at_index == '\n')) {
+        last_idx--;
+        at_index = source[last_idx];
+    }
+
+    for (int i = 0; i < last_idx - first_idx + 1; i++) {
+      source[i] = source[i + first_idx];
+    }
+
+    source[last_idx - first_idx + 1] = 0;
+}
+
 void strip_chars(char* source) {
 	int idx_source = 0;
 	int idx_result = 0;
@@ -74,13 +98,15 @@ int main() {
 		write_prompt();
 
 		int bytes_read = read_input();
+
 		printf("read input: %s", buffer);
 
-
 		strncpy(clean_input, buffer, bytes_read);
-		printf("copied: %s\n", clean_input);
+
+		trim(clean_input);
 		strip_chars(clean_input);
-		printf("After stripping: %s\n", clean_input);
+
+		printf("After stripping: >>%s<<\n", clean_input);
 
 		int input_type = parse_input(clean_input, strlen(clean_input));
 		if (input_type == EXIT_CMD) {
