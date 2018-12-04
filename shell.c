@@ -93,7 +93,6 @@ int strip_chars(char* source, int length) {
 
 
 void write_prompt() {
-	// printf ??
 	write(0, ">>>", 3);
 }
 
@@ -120,7 +119,6 @@ int main() {
 		new_length = strip_chars(clean_input, new_length);
 
 		printf("After stripping: >>%s<<\n", clean_input);
-    printf("New length: %d\n", new_length);
 
 		int input_type = parse_input(clean_input, strlen(clean_input));
 		if (input_type == EXIT_CMD) {
