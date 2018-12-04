@@ -24,10 +24,10 @@ int read_input() {
 	return bytes_read;
 }
 
-void trim(char* source) {
+int trim(char* source, int length) {
     int first_idx = 0;
-    int last_idx = strlen(source) - 1;
-    int length_source = strlen(source);
+    int last_idx = length - 1;
+    int length_source = length;
 
     char at_index = source[first_idx];
     while(first_idx < length_source  && (at_index == ' ' || at_index == '\t' || at_index == '\n')) {
@@ -46,12 +46,14 @@ void trim(char* source) {
     }
 
     source[last_idx - first_idx + 1] = 0;
+    return last_idx - first_idx + 1;
 }
 
-void strip_chars(char* source) {
+int strip_chars(char* source, int length) {
   int idx_source = 0;
   int idx_result = 0;
-  int length_source = strlen(source);
+  int length_source = length;
+  int result_length = 0;
   char at_index = source[idx_source];
 
   while (idx_source < length_source) {
@@ -60,6 +62,7 @@ void strip_chars(char* source) {
         source[idx_result] = at_index;
         idx_source++;
         idx_result++;
+        result_length++;
 
         if (idx_source >= length_source) {
             break;
@@ -76,9 +79,11 @@ void strip_chars(char* source) {
     source[idx_result] = at_index;
     idx_source++;
     idx_result++;
+    result_length++;
   }
 
   source[idx_result] = 0;
+  return result_length;
 }
 
 /*
@@ -107,14 +112,15 @@ int main() {
 
 		int bytes_read = read_input();
 
-		printf("read input: %s", buffer);
+		printf("read input: %s\n", buffer);
 
 		strncpy(clean_input, buffer, bytes_read);
 
-		trim(clean_input);
-		strip_chars(clean_input);
+		int new_length = trim(clean_input, bytes_read);
+		new_length = strip_chars(clean_input, new_length);
 
 		printf("After stripping: >>%s<<\n", clean_input);
+    printf("New length: %d\n", new_length);
 
 		int input_type = parse_input(clean_input, strlen(clean_input));
 		if (input_type == EXIT_CMD) {
