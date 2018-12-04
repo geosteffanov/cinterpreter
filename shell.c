@@ -11,6 +11,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <sys/wait.h>
+#include <errno.h>
 
 # define BUFFER_SIZE 1024
 # define EXIT_CMD 1
@@ -192,11 +193,16 @@ int main() {
         }
 
         int pid = fork();
+        if (pid < 0) {
+          printf("Error in forking.\n");
+        }
+
         if (pid == 0) {
             int errcode = execvp(pcmd[0], pcmd);
-            printf("errcode %d\n", errcode);
-            if (errcode != 0) {
-              printf("PROCESS ERROR\n");
+            if (errno == ENOENT) {
+                printf("shell: command not found\n");
+            } else if (errcode < 0) {
+              printf("Unexpected error.\n");
             }
         }
 
