@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <sys/wait.h>
 
 # define BUFFER_SIZE 1024
 # define EXIT_CMD 1
@@ -127,6 +128,8 @@ int buildPCMD(char cmd[BUFFER_SIZE + 1], int cmdlength, char* pcmd[BUFFER_SIZE +
     pCmdIndex++;
   }
 
+  pcmd[pCmdIndex] = NULL;
+
   return wordCount;
 }
 
@@ -156,23 +159,35 @@ int main() {
 		int length = trim(clean_input, bytes_read);
 		length = strip_chars(clean_input, length);
 
-		printf("After stripping: >>%s<<\n", clean_input);
+    if (length == 0) {
+      continue;
+    }
+
+		// printf("After stripping: >>%s<<\n", clean_input);
 
     int wordCount = buildCmdArray(clean_input, length, cmd);
     wordCount = buildPCMD(cmd, length, pcmd);
 
-    printf("Word count after stripping: %d\n", wordCount);
+    // printf("Word count after stripping: %d\n", wordCount);
 
-    printf("Printing words:\n");
+    // printf("Printing words:\n");
 
-    for (int i = 0; i < wordCount; i++) {
-      printf("words[%d]=%s\n", i, pcmd[i]);
-    }
+    // for (int i = 0; i < wordCount; i++) {
+    //   printf("words[%d]=%s\n", i, pcmd[i]);
+    // }
 
-		int input_type = parse_input(clean_input, strlen(clean_input));
+    int input_type = parse_input(clean_input, length);
 		if (input_type == EXIT_CMD) {
 			exit(0);
-		}
+		} else {
+        int pid = fork();
+        if (pid == 0) {
+            execvp(pcmd[0], pcmd);
+        }
+
+        int stat = 0;
+        waitpid(pid, &stat, 0);
+    }
 	}
 
 	return 0;
