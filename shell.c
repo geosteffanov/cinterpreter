@@ -18,6 +18,9 @@
 char buffer[BUFFER_SIZE];
 char clean_input[BUFFER_SIZE];
 
+char cmd[BUFFER_SIZE + 1];
+char* pcmd[BUFFER_SIZE + 1];
+
 int read_input() {
 	int bytes_read = read(1, buffer, BUFFER_SIZE);
 
@@ -91,6 +94,41 @@ int strip_chars(char* source, int length) {
 	STATE 2:
 */
 
+// returns the number of tokens (or words separated by ' ')
+int buildCmdArray(char* clean_input, int length, char cmd[BUFFER_SIZE]) {
+  int wordCount = 1;
+  for (int i = 0; i < length; i++) {
+    cmd[i] = clean_input[i];
+    if (cmd[i] == ' ') {
+      cmd[i] = 0;
+      wordCount += 1;
+    }
+  }
+
+  cmd[length] = 0;
+
+  return wordCount;
+}
+
+int buildPCMD(char cmd[BUFFER_SIZE + 1], int cmdlength, char* pcmd[BUFFER_SIZE + 1]) {
+  int wordCount = 0;
+  int cmdIndex = 0;
+  int pCmdIndex = 0;
+  while (cmdIndex < cmdlength) {
+    pcmd[pCmdIndex] = &cmd[cmdIndex];
+
+    while (cmd[cmdIndex] != 0) {
+      cmdIndex++;
+    }
+
+    // current char is '\0'
+    wordCount++;
+    cmdIndex++;
+    pCmdIndex++;
+  }
+
+  return wordCount;
+}
 
 void write_prompt() {
 	write(0, ">>>", 3);
@@ -115,10 +153,21 @@ int main() {
 
 		strncpy(clean_input, buffer, bytes_read);
 
-		int new_length = trim(clean_input, bytes_read);
-		new_length = strip_chars(clean_input, new_length);
+		int length = trim(clean_input, bytes_read);
+		length = strip_chars(clean_input, length);
 
 		printf("After stripping: >>%s<<\n", clean_input);
+
+    int wordCount = buildCmdArray(clean_input, length, cmd);
+    wordCount = buildPCMD(cmd, length, pcmd);
+
+    printf("Word count after stripping: %d\n", wordCount);
+
+    printf("Printing words:\n");
+
+    for (int i = 0; i < wordCount; i++) {
+      printf("words[%d]=%s\n", i, pcmd[i]);
+    }
 
 		int input_type = parse_input(clean_input, strlen(clean_input));
 		if (input_type == EXIT_CMD) {
