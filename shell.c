@@ -152,7 +152,7 @@ int main() {
 
 		int bytes_read = read_input();
 
-		printf("read input: %s\n", buffer);
+		// printf("read input: %s\n", buffer);
 
 		strncpy(clean_input, buffer, bytes_read);
 
@@ -180,13 +180,32 @@ int main() {
 		if (input_type == EXIT_CMD) {
 			exit(0);
 		} else {
+        int background = 0;
+        int lastWordLength = strlen(pcmd[wordCount - 1]);
+        if (pcmd[wordCount - 1][lastWordLength - 1] == '&') {
+          background = 1;
+        }
+
+        if (background == 1) {
+          // printf("Executing in background mode\n");
+          pcmd[wordCount - 1] = NULL;
+        }
+
         int pid = fork();
         if (pid == 0) {
-            execvp(pcmd[0], pcmd);
+            int errcode = execvp(pcmd[0], pcmd);
+            printf("errcode %d\n", errcode);
+            if (errcode != 0) {
+              printf("PROCESS ERROR\n");
+            }
         }
 
         int stat = 0;
-        waitpid(pid, &stat, 0);
+        if (background == 0) {
+          // printf("Waiting!\n");
+          waitpid(pid, &stat, 0);
+        }
+        // printf("Finished!\n");
     }
 	}
 
